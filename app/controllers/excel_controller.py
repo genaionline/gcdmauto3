@@ -203,7 +203,26 @@ def view_all_market_results():
     unique_batches = len(set(item['batchId'] for item in aggregated_data))
     unique_users = len(set(item['userId'] for item in aggregated_data))
     unique_markets = len(set(item['market'] for item in aggregated_data))
-    
+
+    # Calculate monthly data statistics for 3 categories
+    monthly_stats = {
+        'lastYearActual': {},
+        'currentYearActual': {},
+        'currentYearTarget': {}
+    }
+
+    months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun",
+             "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
+
+    for item in aggregated_data:
+        for category in ['lastYearActual', 'currentYearActual', 'currentYearTarget']:
+            if category in item and item[category]:
+                for month in months:
+                    if month in item[category] and item[category][month]:
+                        if month not in monthly_stats[category]:
+                            monthly_stats[category][month] = 0
+                        monthly_stats[category][month] += 1
+
     return render_template('excel/viewallmarketresults.html',
                          markets=markets,
                          dataMonths=data_months,
@@ -217,4 +236,6 @@ def view_all_market_results():
                          totalRecords=total_records,
                          uniqueBatches=unique_batches,
                          uniqueUsers=unique_users,
-                         uniqueMarkets=unique_markets)
+                         uniqueMarkets=unique_markets,
+                         monthlyStats=monthly_stats,
+                         months=months)

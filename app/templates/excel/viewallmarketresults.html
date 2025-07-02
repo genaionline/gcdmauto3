@@ -7,12 +7,12 @@
     .data-header {
         background: linear-gradient(135deg, rgb(211,17,69) 0%, rgb(169,14,55) 50%, rgb(139,11,45) 100%);
         color: white;
-        padding: 40px 0;
-        margin-bottom: 30px;
+        padding: 40px 30px;
         box-shadow: 0 8px 32px rgba(211, 17, 69, 0.25);
         position: relative;
         overflow: hidden;
-        border-bottom: 3px solid rgba(255,255,255,0.1);
+        border-radius: 12px;
+        border: 1px solid rgba(255,255,255,0.1);
     }
 
     .data-header::before {
@@ -30,12 +30,32 @@
         position: relative;
         z-index: 1;
     }
+
+    /* Optimize table row height */
+    .table td {
+        padding: 8px 6px;
+        vertical-align: middle;
+        line-height: 1.3;
+    }
+
+    .table th {
+        padding: 10px 6px;
+        vertical-align: middle;
+        line-height: 1.2;
+    }
+
+    /* Compact month columns */
+    .table .month-col {
+        min-width: 45px;
+        max-width: 60px;
+        padding: 6px 4px;
+    }
 </style>
 {% endblock %}
 
 {% block content %}
-<div class="data-header">
-    <div class="container">
+<div class="container">
+    <div class="data-header mb-4">
         <h1 class="mb-0">
             <i class="fas fa-database me-3"></i>All Market Results
         </h1>
@@ -43,9 +63,6 @@
             <i class="fas fa-search me-2"></i>View and filter all uploaded market data
         </p>
     </div>
-</div>
-
-<div class="container">
 
 <!-- Filter Form -->
 <div class="card mb-4">
@@ -108,6 +125,7 @@
 
 <!-- Statistics -->
 {% if aggregatedData %}
+<!-- Database Records Summary -->
 <div class="row mb-4">
     <div class="col-md-12">
         <div class="alert" style="background: linear-gradient(135deg, #28a745 0%, #20c997 100%); color: white; border: none;">
@@ -154,14 +172,31 @@
             <table class="table table-striped table-hover">
                 <thead class="table-dark">
                     <tr>
-                        <th>#</th>
-                        <th>Market</th>
-                        <th>Data Month</th>
-                        <th>Unit</th>
-                        <th>Metric</th>
-                        <th>Batch ID</th>
-                        <th>User</th>
-                        <th>Upload Time</th>
+                        <th rowspan="2">#</th>
+                        <th rowspan="2">Market</th>
+                        <th rowspan="2">Data Month</th>
+                        <th rowspan="2">Unit</th>
+                        <th rowspan="2">Metric</th>
+                        <th rowspan="2">Batch ID</th>
+                        <th rowspan="2">User</th>
+                        <th rowspan="2" style="font-size: 0.8rem;">Upload Time</th>
+                        <th colspan="12" class="text-center" style="background-color: #007bff;">Last Year Actual (LYA)</th>
+                        <th colspan="12" class="text-center" style="background-color: #28a745;">Current Year Actual (CYA)</th>
+                        <th colspan="12" class="text-center" style="background-color: rgb(211,17,69);">Current Year Target (CYT)</th>
+                    </tr>
+                    <tr>
+                        <!-- LYA Months -->
+                        {% for month in months %}
+                        <th class="text-center" style="background-color: #0056b3; font-size: 0.8rem;">{{ month }}</th>
+                        {% endfor %}
+                        <!-- CYA Months -->
+                        {% for month in months %}
+                        <th class="text-center" style="background-color: #20c997; font-size: 0.8rem;">{{ month }}</th>
+                        {% endfor %}
+                        <!-- CYT Months -->
+                        {% for month in months %}
+                        <th class="text-center" style="background-color: rgb(169,14,55); font-size: 0.8rem;">{{ month }}</th>
+                        {% endfor %}
                     </tr>
                 </thead>
                 <tbody>
@@ -172,22 +207,55 @@
                         <td>{{ item.dataMonth }}</td>
                         <td>{{ item.unitName }}</td>
                         <td>{{ item.metricName }}</td>
-                        <td>
-                            <small class="text-muted">{{ item.batchId[:20] }}{% if item.batchId|length > 20 %}...{% endif %}</small>
+                        <td style="font-size: 0.75rem; line-height: 1.2;">
+                            <span class="text-muted">{{ item.batchId[:20] }}{% if item.batchId|length > 20 %}...{% endif %}</span>
                         </td>
                         <td>{{ item.userId }}</td>
-                        <td>
+                        <td style="font-size: 0.75rem; line-height: 1.2;">
                             {% if item.uploadTime %}
-                            <small>{{ item.uploadTime.strftime('%Y-%m-%d %H:%M') }}</small>
+                            {{ item.uploadTime.strftime('%Y-%m-%d %H:%M') }}
                             {% else %}
-                            <small class="text-muted">N/A</small>
+                            <span class="text-muted">N/A</span>
                             {% endif %}
                         </td>
+
+                        <!-- Last Year Actual (LYA) - 12 months -->
+                        {% for month in months %}
+                        <td class="text-center month-col" style="background-color: rgba(0, 123, 255, 0.1); font-size: 0.75rem; line-height: 1.2;">
+                            {% if item.lastYearActual and item.lastYearActual.get(month) %}
+                                {{ item.lastYearActual[month] }}
+                            {% else %}
+                                <span class="text-muted">-</span>
+                            {% endif %}
+                        </td>
+                        {% endfor %}
+
+                        <!-- Current Year Actual (CYA) - 12 months -->
+                        {% for month in months %}
+                        <td class="text-center month-col" style="background-color: rgba(40, 167, 69, 0.1); font-size: 0.75rem; line-height: 1.2;">
+                            {% if item.currentYearActual and item.currentYearActual.get(month) %}
+                                {{ item.currentYearActual[month] }}
+                            {% else %}
+                                <span class="text-muted">-</span>
+                            {% endif %}
+                        </td>
+                        {% endfor %}
+
+                        <!-- Current Year Target (CYT) - 12 months -->
+                        {% for month in months %}
+                        <td class="text-center month-col" style="background-color: rgba(211, 17, 69, 0.1); font-size: 0.75rem; line-height: 1.2;">
+                            {% if item.currentYearTarget and item.currentYearTarget.get(month) %}
+                                {{ item.currentYearTarget[month] }}
+                            {% else %}
+                                <span class="text-muted">-</span>
+                            {% endif %}
+                        </td>
+                        {% endfor %}
                     </tr>
                     {% endfor %}
                     {% if aggregatedData|length > 100 %}
                     <tr>
-                        <td colspan="8" class="text-center text-muted">
+                        <td colspan="44" class="text-center text-muted">
                             ... and {{ aggregatedData|length - 100 }} more records (showing first 100)
                         </td>
                     </tr>
