@@ -1,15 +1,17 @@
-# GCDM Auto - Python Flask Version
+# GCDM Auto - Flask Application
 
-This is a Python Flask conversion of the original Java Spring Boot GCDM Auto application. It provides Excel file upload, processing, and data management capabilities for multiple markets.
+A comprehensive Excel file processing and data management application built with Python Flask. Provides secure file upload, processing, and data management capabilities for multiple markets.
 
 ## Features
 
 - **Excel File Upload**: Upload and process Excel files using pandas for efficient data handling
-- **Market Configuration**: YAML-based configuration for each market
+- **Market Configuration**: YAML-based configuration for each market with admin access
 - **Data Management**: Store and retrieve Excel data with SQLite database
-- **Admin Interface**: Manage data periods and system settings
-- **Security Auditing**: Comprehensive logging and security monitoring
-- **Web Interface**: User-friendly web interface with Bootstrap styling
+- **Hierarchical Navigation**: Organized menu structure with admin dropdown containing config and data month management
+- **Enhanced Security**: Comprehensive security measures including input validation, rate limiting, and attack prevention
+- **Security Auditing**: Detailed logging and security monitoring with real-time threat detection
+- **Modern UI**: Responsive web interface with optimized red color scheme and intuitive navigation
+- **Cross-Platform**: Support for both Linux/macOS and Windows with dedicated startup scripts
 
 ## Project Structure
 
@@ -264,14 +266,6 @@ python -m pytest tests/ -v
 - Create new services in `app/services/`
 - Add database models in `app/models/`
 - Create templates in `app/templates/`
-
-## Migration from Java Version
-
-This Python version maintains compatibility with the original Java application:
-- Same database schema (converted to SQLAlchemy)
-- Same configuration file format (YAML)
-- Same web interface design
-- Same business logic and workflows
 
 ## Support
 
