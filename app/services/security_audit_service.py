@@ -80,6 +80,15 @@ class SecurityAuditService:
         # Fall back to remote address
         return request_obj.remote_addr or 'unknown'
 
+    def log_file_download(self, user_id: str, file_name: str, request_obj: Optional['Request'] = None):
+        """Log file download events"""
+        client_ip = self._get_client_ip_address(request_obj)
+
+        security_logger.info(
+            f"FILE_DOWNLOAD: User: {user_id} | File: {file_name} | "
+            f"IP: {client_ip} | Time: {datetime.now()}"
+        )
+
 
 # Global instance
 security_audit_service = SecurityAuditService()

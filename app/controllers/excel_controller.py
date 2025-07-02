@@ -6,7 +6,7 @@ import os
 import uuid
 import logging
 from datetime import datetime
-from flask import Blueprint, render_template, request, redirect, url_for, flash, jsonify
+from flask import Blueprint, render_template, request, redirect, url_for, flash, jsonify, current_app
 from werkzeug.utils import secure_filename
 
 from app.services.market_config_loader import market_config_loader
@@ -71,13 +71,19 @@ def upload():
             
             # Generate batch ID
             batch_id = f"{market}_{data_month}_{datetime.now().strftime('%Y%m%d_%H%M%S')}_{str(uuid.uuid4())[:8]}"
-            
+
+            # Save the uploaded file with batch_id prefix for later download
+            saved_filename = f"{batch_id}_{secure_filename(file.filename)}"
+            saved_file_path = os.path.join(current_app.config['UPLOAD_FOLDER'], saved_filename)
+            file.save(saved_file_path)
+            file.seek(0)  # Reset file pointer for processing
+
             # Log file upload
             security_audit_service.log_file_upload(
                 user_id, file.filename, len(file.read()), market, request
             )
             file.seek(0)  # Reset file pointer
-            
+
             # Process Excel file
             result = excel_service.process_excel_file(file, market)
             data = result.get('data', {})
