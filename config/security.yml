@@ -1,0 +1,77 @@
+# Security Configuration for GCDM Auto Flask Application
+
+# Rate Limiting
+rate_limiting:
+  max_requests_per_minute: 60
+  max_requests_per_hour: 1000
+  block_duration_seconds: 3600
+
+# File Upload Security
+file_upload:
+  max_file_size_mb: 16
+  allowed_extensions:
+    - .xlsx
+    - .xls
+  max_filename_length: 255
+  scan_for_malware: false  # Set to true if antivirus scanning is available
+
+# Input Validation
+input_validation:
+  max_parameter_length: 1000
+  max_query_parameters: 20
+  max_form_parameters: 50
+  allowed_characters_regex: "^[a-zA-Z0-9\\s\\-_.,()\\[\\]]+$"
+
+# Network Security
+network:
+  allowed_hosts:
+    - localhost:8080
+    - 127.0.0.1:8080
+    - localhost
+    - 127.0.0.1
+  bind_address: 127.0.0.1
+  port: 8080
+
+# Session Security
+session:
+  secure_cookies: true
+  httponly_cookies: true
+  samesite_cookies: "Strict"
+  session_timeout_minutes: 30
+
+# Logging
+logging:
+  log_security_events: true
+  log_failed_attempts: true
+  log_suspicious_activity: true
+  max_log_file_size_mb: 100
+
+# Content Security Policy
+csp:
+  default_src: "'self'"
+  script_src: "'self' 'unsafe-inline' https://cdn.jsdelivr.net"
+  style_src: "'self' 'unsafe-inline' https://cdn.jsdelivr.net"
+  font_src: "'self' https://cdn.jsdelivr.net"
+  img_src: "'self' data:"
+  connect_src: "'self'"
+  form_action: "'self'"
+  frame_ancestors: "'none'"
+  object_src: "'none'"
+  base_uri: "'self'"
+
+# Security Headers
+headers:
+  x_content_type_options: "nosniff"
+  x_frame_options: "DENY"
+  x_xss_protection: "1; mode=block"
+  referrer_policy: "strict-origin-when-cross-origin"
+  cache_control: "no-cache, no-store, must-revalidate, private"
+  pragma: "no-cache"
+  expires: "0"
+
+# Database Security
+database:
+  use_parameterized_queries: true
+  validate_input_types: true
+  log_query_errors: true
+  connection_timeout_seconds: 30

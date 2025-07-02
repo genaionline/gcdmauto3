@@ -1,0 +1,161 @@
+{% extends "base.html" %}
+
+{% block title %}GCDM File Upload{% endblock %}
+
+{% block extra_css %}
+<style>
+    .file-input {
+        border: 2px dashed #dee2e6;
+        border-radius: 5px;
+        padding: 20px;
+        text-align: center;
+        background-color: #f8f9fa;
+        transition: all 0.3s ease;
+    }
+    .file-input:hover {
+        border-color: #007bff;
+        background-color: #e7f3ff;
+    }
+    .file-input input[type="file"] {
+        width: 100%;
+        padding: 10px;
+        border: none;
+        background: transparent;
+    }
+    .upload-header {
+        background: linear-gradient(135deg, rgb(211,17,69) 0%, rgb(169,14,55) 50%, rgb(139,11,45) 100%);
+        color: white;
+        padding: 40px 0;
+        margin-bottom: 30px;
+        box-shadow: 0 8px 32px rgba(211, 17, 69, 0.25);
+        position: relative;
+        overflow: hidden;
+        border-bottom: 3px solid rgba(255,255,255,0.1);
+    }
+
+    .upload-header::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="upload-pattern" width="60" height="60" patternUnits="userSpaceOnUse"><circle cx="30" cy="30" r="2" fill="rgba(255,255,255,0.08)"/><path d="M20,30 L25,25 L30,30 L35,25 L40,30" stroke="rgba(255,255,255,0.06)" stroke-width="1" fill="none"/><rect x="15" y="40" width="30" height="2" fill="rgba(255,255,255,0.04)"/></pattern></defs><rect width="100" height="100" fill="url(%23upload-pattern)"/></svg>');
+        opacity: 0.4;
+    }
+
+    .upload-header .container {
+        position: relative;
+        z-index: 1;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="upload-header">
+    <div class="container">
+        <h1 class="mb-0">
+            <i class="fas fa-cloud-upload-alt me-3"></i>GCDM Excel File Upload
+        </h1>
+        <p class="mb-0 fs-5">
+            <i class="fas fa-chart-bar me-2"></i>Upload your Excel files for processing and analysis
+        </p>
+    </div>
+</div>
+
+<div class="container">
+    <form method="POST" enctype="multipart/form-data" class="needs-validation" novalidate>
+        <!-- Market Selection -->
+        <div class="mb-3">
+            <label for="market" class="form-label">Select Market:</label>
+            <select name="market" id="market" class="form-select" required>
+                <option value="">-- Select Market --</option>
+                {% for market in markets %}
+                <option value="{{ market }}">{{ market }}</option>
+                {% endfor %}
+            </select>
+            <div class="invalid-feedback">Please select a market.</div>
+        </div>
+
+        <!-- Data Month Selection -->
+        <div class="mb-3">
+            <label for="dataMonth" class="form-label">Data Month:</label>
+            <select name="dataMonth" id="dataMonth" class="form-select" required>
+                <option value="">-- Select Data Month --</option>
+                {% for period in allDataPeriods %}
+                <option value="{{ period.data_month }}">{{ period.market_name }} - {{ period.data_month }}</option>
+                {% endfor %}
+            </select>
+            <div class="invalid-feedback">Please select a data month.</div>
+        </div>
+
+        <!-- File Upload -->
+        <div class="mb-3">
+            <label for="file" class="form-label">Select Excel File:</label>
+            <div class="file-input">
+                <input type="file" name="file" id="file" class="form-control" accept=".xlsx,.xls" required>
+                <small class="form-text text-muted mt-2">Please select an Excel file (.xlsx or .xls)</small>
+            </div>
+            <div class="invalid-feedback">Please select a file.</div>
+        </div>
+
+        <!-- Submit Button -->
+        <div class="d-grid gap-2 d-md-flex justify-content-md-start">
+            <button type="submit" class="btn btn-primary btn-lg">
+                <i class="fas fa-cloud-upload-alt me-2"></i>Upload File
+            </button>
+            <a href="{{ url_for('excel.view_all_market_results') }}" class="btn btn-outline-secondary btn-lg">
+                <i class="fas fa-table me-2"></i>View Data
+            </a>
+        </div>
+    </form>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// Data months from server
+var allDataPeriods = {{ allDataPeriods | tojson }};
+
+// Filter data months based on selected market
+document.getElementById('market').addEventListener('change', function() {
+    var selectedMarket = this.value;
+    var dataMonthSelect = document.getElementById('dataMonth');
+    
+    // Clear existing options
+    dataMonthSelect.innerHTML = '<option value="">-- Select Data Month --</option>';
+    
+    if (selectedMarket) {
+        // Filter periods for selected market
+        var filteredPeriods = allDataPeriods.filter(function(period) {
+            return period.market_name === selectedMarket;
+        });
+        
+        // Add filtered options
+        filteredPeriods.forEach(function(period) {
+            var option = document.createElement('option');
+            option.value = period.data_month;
+            option.textContent = period.market_name + ' - ' + period.data_month;
+            dataMonthSelect.appendChild(option);
+        });
+    }
+});
+
+// Form validation
+(function() {
+    'use strict';
+    window.addEventListener('load', function() {
+        var forms = document.getElementsByClassName('needs-validation');
+        var validation = Array.prototype.filter.call(forms, function(form) {
+            form.addEventListener('submit', function(event) {
+                if (form.checkValidity() === false) {
+                    event.preventDefault();
+                    event.stopPropagation();
+                }
+                form.classList.add('was-validated');
+            }, false);
+        });
+    }, false);
+})();
+</script>
+{% endblock %}

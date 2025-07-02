@@ -1,0 +1,157 @@
+{% extends "base.html" %}
+
+{% block title %}Data Month Management - GCDM Admin{% endblock %}
+
+{% block extra_css %}
+<style>
+    .admin-header {
+        background: linear-gradient(135deg, rgb(211,17,69) 0%, rgb(169,14,55) 50%, rgb(139,11,45) 100%);
+        color: white;
+        padding: 40px 0;
+        margin-bottom: 30px;
+        box-shadow: 0 8px 32px rgba(211, 17, 69, 0.25);
+        position: relative;
+        overflow: hidden;
+        border-bottom: 3px solid rgba(255,255,255,0.1);
+    }
+
+    .admin-header::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="admin-pattern" width="50" height="50" patternUnits="userSpaceOnUse"><circle cx="25" cy="25" r="3" fill="rgba(255,255,255,0.08)"/><rect x="15" y="15" width="20" height="20" fill="none" stroke="rgba(255,255,255,0.06)" stroke-width="1"/><path d="M20,20 L30,30 M30,20 L20,30" stroke="rgba(255,255,255,0.04)" stroke-width="1"/></pattern></defs><rect width="100" height="100" fill="url(%23admin-pattern)"/></svg>');
+        opacity: 0.4;
+    }
+
+    .admin-header .container {
+        position: relative;
+        z-index: 1;
+    }
+    .form-section {
+        background-color: #f8f9fa;
+        padding: 20px;
+        border-radius: 8px;
+        margin-bottom: 30px;
+    }
+    .active-badge {
+        background-color: #28a745;
+    }
+    .inactive-badge {
+        background-color: #6c757d;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="admin-header">
+    <div class="container">
+        <h1 class="mb-0">
+            <i class="fas fa-calendar-alt me-3"></i>Data Month Management
+        </h1>
+        <p class="mb-0 fs-5">
+            <i class="fas fa-cogs me-2"></i>Manage data periods for different markets
+        </p>
+    </div>
+</div>
+
+<div class="container">
+    <!-- Add New Data Month Form -->
+    <div class="form-section">
+        <h3 class="mb-3">Add New Data Month</h3>
+        <form method="POST">
+            <div class="row g-3">
+                <div class="col-md-3">
+                    <label for="marketName" class="form-label">Market:</label>
+                    <select name="marketName" id="marketName" class="form-select" required>
+                        <option value="">-- Select Market --</option>
+                        {% for market in markets %}
+                        <option value="{{ market }}">{{ market }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label for="dataMonth" class="form-label">Data Month:</label>
+                    <input type="text" name="dataMonth" id="dataMonth" class="form-control"
+                           placeholder="e.g., 2025-Apr" required>
+                </div>
+                <div class="col-md-3">
+                    <label for="activeIdc" class="form-label">Status:</label>
+                    <select name="activeIdc" id="activeIdc" class="form-select">
+                        <option value="Y">Active</option>
+                        <option value="N">Inactive</option>
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label">&nbsp;</label>
+                    <button type="submit" class="btn btn-primary d-block">Add Data Month</button>
+                </div>
+            </div>
+        </form>
+    </div>
+
+    <!-- Existing Data Months -->
+    <h3 class="mb-3">Existing Data Months</h3>
+    
+    {% if dataPeriods %}
+    <div class="table-responsive">
+        <table class="table table-striped table-hover">
+            <thead class="table-dark">
+                <tr>
+                    <th>ID</th>
+                    <th>Market</th>
+                    <th>Data Month</th>
+                    <th>Active</th>
+                    <th>Updated By</th>
+                    <th>Update Time</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for period in dataPeriods %}
+                <tr>
+                    <td>{{ period.id }}</td>
+                    <td>{{ period.market_name }}</td>
+                    <td>{{ period.data_month }}</td>
+                    <td>
+                        {% if period.active_idc == 'Y' %}
+                        <span class="badge active-badge">Active</span>
+                        {% else %}
+                        <span class="badge inactive-badge">Inactive</span>
+                        {% endif %}
+                    </td>
+                    <td>{{ period.update_by }}</td>
+                    <td>{{ period.update_time.strftime('%Y-%m-%d %H:%M') if period.update_time else 'N/A' }}</td>
+                    <td>
+                        <div class="btn-group btn-group-sm">
+                            <!-- Toggle Status -->
+                            <form method="POST" action="{{ url_for('admin.update_data_month', period_id=period.id) }}" style="display: inline;">
+                                <input type="hidden" name="activeIdc" value="{{ 'N' if period.active_idc == 'Y' else 'Y' }}">
+                                <button type="submit" class="btn btn-outline-primary btn-sm">
+                                    {{ 'Deactivate' if period.active_idc == 'Y' else 'Activate' }}
+                                </button>
+                            </form>
+                            
+                            <!-- Delete -->
+                            <form method="POST" action="{{ url_for('admin.delete_data_month', period_id=period.id) }}" 
+                                  style="display: inline;" 
+                                  onsubmit="return confirm('Are you sure you want to delete this data period?');">
+                                <button type="submit" class="btn btn-outline-danger btn-sm">Delete</button>
+                            </form>
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <div class="alert alert-info">
+        <h5>No Data Periods Found</h5>
+        <p>No data periods have been created yet. Use the form above to add new data periods.</p>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

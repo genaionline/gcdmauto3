@@ -1,0 +1,19 @@
+markets:
+  - code: SG
+    name: Singapore
+    description: Singapore Market
+  - code: CN
+    name: China
+    description: China Market
+  - code: HK
+    name: Hong Kong
+    description: Hong Kong Market
+  - code: MY
+    name: Malaysia
+    description: Malaysia Market
+  - code: TH
+    name: Thailand
+    description: Thailand Market
+  - code: IN
+    name: Indonesia
+    description: Indonesia Market

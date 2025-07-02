@@ -1,0 +1,168 @@
+requireBuPrefix: false
+requireXlsxSuffix: true
+fileEncoding: "UTF-8"
+worksheet:
+  name: "Customer Metrics2"
+  dataRowRange:
+    startRow: 7
+    endRow: 200
+    headerRow: 4
+  dataColumnRange:
+    startColumn: 1
+    endColumn: 58
+  units:
+    columnNum: 1
+    allowedValues:
+      - "Acquisition"
+      - "Engagement"
+      - "Repurchase"
+  metrics:
+    columnNum: 3
+    allowedValues:
+      - "# of Leads"
+      - "# of Mature Leads"
+      - "# of Leads Assigned"
+      - "# of Leads Act on"
+      - "# of Leads Conversion"
+      - "ANP from mature leads"
+      - "VONB from mature leads"
+  lastYearActual:
+    startColumn: 21
+    endColumn: 32
+    columns:
+      - name: "Jan_LYA"
+        description: "Jan Last Year Actual"
+        allowNull: false
+      - name: "Feb_LYA"
+        description: "Feb Last Year Actual"
+        allowNull: false
+      - name: "Mar_LYA"
+        description: "Mar Last Year Actual"
+        allowNull: false
+      - name: "Apr_LYA"
+        description: "Apr Last Year Actual"
+        allowNull: false
+      - name: "May_LYA"
+        description: "May Last Year Actual"
+        allowNull: false
+      - name: "Jun_LYA"
+        description: "Jun Last Year Actual"
+        allowNull: false
+      - name: "Jul_LYA"
+        description: "Jul Last Year Actual"
+        allowNull: false
+      - name: "Aug_LYA"
+        description: "Aug Last Year Actual"
+        allowNull: false
+      - name: "Sep_LYA"
+        description: "Sep Last Year Actual"
+        allowNull: false
+      - name: "Oct_LYA"
+        description: "Oct Last Year Actual"
+        allowNull: false
+      - name: "Nov_LYA"
+        description: "Nov Last Year Actual"
+        allowNull: false
+      - name: "Dec_LYA"
+        description: "Dec Last Year Actual"
+        allowNull: false
+  currentYearActual:
+    startColumn: 34
+    endColumn: 45
+    columns:
+      - name: "Jan_CYA"
+        description: "Jan Current Year Actual"
+        allowNull: false
+      - name: "Feb_CYA"
+        description: "Feb Current Year Actual"
+        allowNull: true
+      - name: "Mar_CYA"
+        description: "Mar Current Year Actual"
+        allowNull: true
+      - name: "Apr_CYA"
+        description: "Apr Current Year Actual"
+        allowNull: true
+      - name: "May_CYA"
+        description: "May Current Year Actual"
+        allowNull: true
+      - name: "Jun_CYA"
+        description: "Jun Current Year Actual"
+        allowNull: true
+      - name: "Jul_CYA"
+        description: "Jul Current Year Actual"
+        allowNull: true
+      - name: "Aug_CYA"
+        description: "Aug Current Year Actual"
+        allowNull: true
+      - name: "Sep_CYA"
+        description: "Sep Current Year Actual"
+        allowNull: true
+      - name: "Oct_CYA"
+        description: "Oct Current Year Actual"
+        allowNull: true
+      - name: "Nov_CYA"
+        description: "Nov Current Year Actual"
+        allowNull: true
+      - name: "Dec_CYA"
+        description: "Dec Current Year Actual"
+        allowNull: true
+  currentYearTarget:
+    startColumn: 47
+    endColumn: 58
+    columns:
+      - name: "Jan_CYT"
+        description: "Jan Current Year Target"
+        allowNull: false
+      - name: "Feb_CYT"
+        description: "Feb Current Year Target"
+        allowNull: false
+      - name: "Mar_CYT"
+        description: "Mar Current Year Target"
+        allowNull: false
+      - name: "Apr_CYT"
+        description: "Apr Current Year Target"
+        allowNull: false
+      - name: "May_CYT"
+        description: "May Current Year Target"
+        allowNull: false
+      - name: "Jun_CYT"
+        description: "Jun Current Year Target"
+        allowNull: false
+      - name: "Jul_CYT"
+        description: "Jul Current Year Target"
+        allowNull: false
+      - name: "Aug_CYT"
+        description: "Aug Current Year Target"
+        allowNull: false
+      - name: "Sep_CYT"
+        description: "Sep Current Year Target"
+        allowNull: false
+      - name: "Oct_CYT"
+        description: "Oct Current Year Target"
+        allowNull: false
+      - name: "Nov_CYT"
+        description: "Nov Current Year Target"
+        allowNull: false
+      - name: "Dec_CYT"
+        description: "Dec Current Year Target"
+        allowNull: false
+validationRules:
+  validateFileExists: true
+  validateWorksheetExists: true
+  validateDataRange: true
+  validateUnits: true
+  validateMetrics: true
+  customValidations:
+    minValue: "0"
+    maxValue: "1000000"
+dataTransformRules:
+  trimWhitespace: true
+  convertToUpperCase: true
+  valueMappings:
+    "N/A": "0"
+    "TBD": ""
+  formatMappings:
+    "NUMBER": "#,##0"
+    "PERCENTAGE": "0.00%"
+
+# 其他业务配置可以继续添加 

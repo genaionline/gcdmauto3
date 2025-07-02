@@ -1,0 +1,215 @@
+{% extends "base.html" %}
+
+{% block title %}All Market Results - GCDM Excel Data{% endblock %}
+
+{% block extra_css %}
+<style>
+    .data-header {
+        background: linear-gradient(135deg, rgb(211,17,69) 0%, rgb(169,14,55) 50%, rgb(139,11,45) 100%);
+        color: white;
+        padding: 40px 0;
+        margin-bottom: 30px;
+        box-shadow: 0 8px 32px rgba(211, 17, 69, 0.25);
+        position: relative;
+        overflow: hidden;
+        border-bottom: 3px solid rgba(255,255,255,0.1);
+    }
+
+    .data-header::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="data-pattern" width="50" height="50" patternUnits="userSpaceOnUse"><circle cx="25" cy="25" r="2" fill="rgba(255,255,255,0.08)"/><rect x="15" y="15" width="20" height="3" fill="rgba(255,255,255,0.06)"/><rect x="15" y="22" width="15" height="3" fill="rgba(255,255,255,0.04)"/><rect x="15" y="29" width="18" height="3" fill="rgba(255,255,255,0.05)"/><circle cx="10" cy="10" r="1" fill="rgba(255,255,255,0.03)"/><circle cx="40" cy="40" r="1" fill="rgba(255,255,255,0.03)"/></pattern></defs><rect width="100" height="100" fill="url(%23data-pattern)"/></svg>');
+        opacity: 0.4;
+    }
+
+    .data-header .container {
+        position: relative;
+        z-index: 1;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="data-header">
+    <div class="container">
+        <h1 class="mb-0">
+            <i class="fas fa-database me-3"></i>All Market Results
+        </h1>
+        <p class="mb-0 fs-5">
+            <i class="fas fa-search me-2"></i>View and filter all uploaded market data
+        </p>
+    </div>
+</div>
+
+<div class="container">
+
+<!-- Filter Form -->
+<div class="card mb-4">
+    <div class="card-header">
+        <h5 class="mb-0">Filter Data</h5>
+    </div>
+    <div class="card-body">
+        <form method="GET" class="row g-3">
+            <div class="col-md-3">
+                <label for="selectedMarket" class="form-label">Market:</label>
+                <select name="selectedMarket" id="selectedMarket" class="form-select">
+                    <option value="">All Markets</option>
+                    {% for market in markets %}
+                    <option value="{{ market }}" {% if market == selectedMarket %}selected{% endif %}>
+                        {{ market }}
+                    </option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-3">
+                <label for="selectedDataMonth" class="form-label">Data Month:</label>
+                <select name="selectedDataMonth" id="selectedDataMonth" class="form-select">
+                    <option value="">All Months</option>
+                    {% for month in dataMonths %}
+                    <option value="{{ month }}" {% if month == selectedDataMonth %}selected{% endif %}>
+                        {{ month }}
+                    </option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-3">
+                <label for="selectedBatchId" class="form-label">Batch ID:</label>
+                <select name="selectedBatchId" id="selectedBatchId" class="form-select">
+                    <option value="">All Batches</option>
+                    {% for batch in batchIds %}
+                    <option value="{{ batch }}" {% if batch == selectedBatchId %}selected{% endif %}>
+                        {{ batch }}
+                    </option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-3">
+                <label for="selectedUserId" class="form-label">User:</label>
+                <select name="selectedUserId" id="selectedUserId" class="form-select">
+                    <option value="">All Users</option>
+                    {% for user in userIds %}
+                    <option value="{{ user }}" {% if user == selectedUserId %}selected{% endif %}>
+                        {{ user }}
+                    </option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-12">
+                <button type="submit" class="btn btn-primary">Apply Filters</button>
+                <a href="{{ url_for('excel.view_all_market_results') }}" class="btn btn-outline-secondary">Clear Filters</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Statistics -->
+{% if aggregatedData %}
+<div class="row mb-4">
+    <div class="col-md-12">
+        <div class="alert" style="background: linear-gradient(135deg, #28a745 0%, #20c997 100%); color: white; border: none;">
+            <h5 class="mb-3">
+                <i class="bi bi-database"></i> Database Records Summary
+            </h5>
+            <div class="row text-center">
+                <div class="col-md-3">
+                    <div class="mb-2">
+                        <i class="bi bi-list-ol"></i> <strong>Total Records</strong>
+                    </div>
+                    <span class="badge bg-light text-dark" style="font-size: 0.9rem; padding: 6px 12px;">{{ totalRecords }}</span>
+                </div>
+                <div class="col-md-3">
+                    <div class="mb-2">
+                        <i class="bi bi-archive"></i> <strong>Unique Batches</strong>
+                    </div>
+                    <span class="badge bg-light text-dark" style="font-size: 0.9rem; padding: 6px 12px;">{{ uniqueBatches }}</span>
+                </div>
+                <div class="col-md-3">
+                    <div class="mb-2">
+                        <i class="bi bi-people"></i> <strong>Unique Users</strong>
+                    </div>
+                    <span class="badge bg-light text-dark" style="font-size: 0.9rem; padding: 6px 12px;">{{ uniqueUsers }}</span>
+                </div>
+                <div class="col-md-3">
+                    <div class="mb-2">
+                        <i class="bi bi-globe"></i> <strong>Unique Markets</strong>
+                    </div>
+                    <span class="badge bg-light text-dark" style="font-size: 0.9rem; padding: 6px 12px;">{{ uniqueMarkets }}</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Data Table -->
+<div class="card">
+    <div class="card-header">
+        <h5 class="mb-0">Data Records ({{ totalRecords }} records)</h5>
+    </div>
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-striped table-hover">
+                <thead class="table-dark">
+                    <tr>
+                        <th>#</th>
+                        <th>Market</th>
+                        <th>Data Month</th>
+                        <th>Unit</th>
+                        <th>Metric</th>
+                        <th>Batch ID</th>
+                        <th>User</th>
+                        <th>Upload Time</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in aggregatedData[:100] %}
+                    <tr>
+                        <td>{{ loop.index }}</td>
+                        <td>{{ item.market }}</td>
+                        <td>{{ item.dataMonth }}</td>
+                        <td>{{ item.unitName }}</td>
+                        <td>{{ item.metricName }}</td>
+                        <td>
+                            <small class="text-muted">{{ item.batchId[:20] }}{% if item.batchId|length > 20 %}...{% endif %}</small>
+                        </td>
+                        <td>{{ item.userId }}</td>
+                        <td>
+                            {% if item.uploadTime %}
+                            <small>{{ item.uploadTime.strftime('%Y-%m-%d %H:%M') }}</small>
+                            {% else %}
+                            <small class="text-muted">N/A</small>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                    {% if aggregatedData|length > 100 %}
+                    <tr>
+                        <td colspan="8" class="text-center text-muted">
+                            ... and {{ aggregatedData|length - 100 }} more records (showing first 100)
+                        </td>
+                    </tr>
+                    {% endif %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% else %}
+<!-- No Data Message -->
+<div class="alert alert-warning">
+    <h5>No Data Available</h5>
+    {% if selectedMarket or selectedDataMonth or selectedBatchId or selectedUserId %}
+    <p>No data was found matching the selected filters.</p>
+    {% else %}
+    <p>No Excel data has been uploaded yet. Please upload some Excel files first to view market results.</p>
+    <a href="{{ url_for('excel.upload') }}" class="btn btn-primary">Upload Excel File</a>
+    {% endif %}
+</div>
+{% endif %}
+
+
+</div>
+{% endblock %}

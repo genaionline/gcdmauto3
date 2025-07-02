@@ -1,0 +1,164 @@
+{% extends "base.html" %}
+
+{% block title %}Upload Results - GCDM Excel Data{% endblock %}
+
+{% block extra_css %}
+<style>
+    .success-header {
+        background: linear-gradient(135deg, rgb(211,17,69) 0%, rgb(169,14,55) 50%, rgb(139,11,45) 100%);
+        color: white;
+        padding: 40px 0;
+        margin-bottom: 30px;
+        box-shadow: 0 8px 32px rgba(211, 17, 69, 0.25);
+        position: relative;
+        overflow: hidden;
+        border-bottom: 3px solid rgba(255,255,255,0.1);
+    }
+
+    .success-header::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="success-pattern" width="60" height="60" patternUnits="userSpaceOnUse"><circle cx="30" cy="30" r="3" fill="rgba(255,255,255,0.08)"/><path d="M20,30 L27,37 L40,23" stroke="rgba(255,255,255,0.06)" stroke-width="2" fill="none"/><circle cx="15" cy="15" r="1" fill="rgba(255,255,255,0.04)"/><circle cx="45" cy="45" r="1" fill="rgba(255,255,255,0.04)"/></pattern></defs><rect width="100" height="100" fill="url(%23success-pattern)"/></svg>');
+        opacity: 0.4;
+    }
+
+    .success-header .container {
+        position: relative;
+        z-index: 1;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="success-header">
+    <div class="container">
+        <h1 class="mb-0">
+            <i class="fas fa-check-circle me-3"></i>Upload Results
+        </h1>
+        <p class="mb-0 fs-5">
+            <i class="fas fa-file-excel me-2"></i>Your Excel file has been successfully processed
+        </p>
+    </div>
+</div>
+
+<div class="container">
+
+<div class="alert alert-success">
+    <h5 class="mb-3">
+        <i class="bi bi-check-circle"></i> File Upload Successful
+    </h5>
+    <p class="mb-0">Your Excel file has been successfully processed and saved to the database.</p>
+</div>
+
+<!-- Upload Information -->
+<div class="row mb-4">
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">Market</h5>
+                <p class="card-text">{{ market }}</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">Data Month</h5>
+                <p class="card-text">{{ dataMonth }}</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">Batch ID</h5>
+                <p class="card-text">{{ batchId }}</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Excel Data Display -->
+{% if data %}
+<!-- Summary Information -->
+<div class="row mb-4">
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">Worksheet</h5>
+                <p class="card-text">{{ data.worksheetName or 'N/A' }}</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">Units Count</h5>
+                <p class="card-text">{{ data.units|length if data.units else 0 }}</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">Metrics Count</h5>
+                <p class="card-text">{{ data.metrics|length if data.metrics else 0 }}</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Data Preview -->
+{% if data.units %}
+<div class="card">
+    <div class="card-header">
+        <h5 class="mb-0">Data Preview</h5>
+    </div>
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Unit</th>
+                        <th>Metric</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for unit in data.units[:10] %}
+                    <tr>
+                        <td>{{ loop.index }}</td>
+                        <td>{{ unit }}</td>
+                        <td>{{ data.metrics[loop.index0] if loop.index0 < data.metrics|length else 'N/A' }}</td>
+                    </tr>
+                    {% endfor %}
+                    {% if data.units|length > 10 %}
+                    <tr>
+                        <td colspan="3" class="text-center text-muted">
+                            ... and {{ data.units|length - 10 }} more records
+                        </td>
+                    </tr>
+                    {% endif %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endif %}
+{% endif %}
+
+<!-- Navigation -->
+<div class="mt-4">
+    <a href="{{ url_for('excel.upload') }}" class="btn btn-primary">
+        <i class="fas fa-plus me-2"></i>Upload Another File
+    </a>
+    <a href="{{ url_for('excel.view_all_market_results') }}" class="btn btn-outline-primary">
+        <i class="fas fa-table me-2"></i>View All Data
+    </a>
+</div>
+</div>
+{% endblock %}
